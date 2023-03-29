@@ -13,11 +13,7 @@ spec:
     spec:
       containers:
       - name: test1
-        image: docreg.eprocure.gov.pk/test:${BUILD_NUMBER}
-        resources:
-          limits:
-            memory: "128Mi"
-            cpu: "500m"
+        image: docreg.eprocure.gov.pk/test:latest
         ports:
         - containerPort: 80 
       imagePullSecrets:
