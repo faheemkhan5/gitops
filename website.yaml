@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test1
+spec:
+  selector:
+    matchLabels:
+      app: test1
+  template:
+    metadata:
+      labels:
+        app: test1
+    spec:
+      containers:
+      - name: test1
+        image: docreg.eprocure.gov.pk/test:${BUILD_NUMBER}
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80 
+      imagePullSecrets:
+       - name: acr-auth
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  name: test1
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 80
+    
+  selector:
+    app: test1
+  type: LoadBalancer
+status:
+  loadBalancer: {}
