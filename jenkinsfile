@@ -29,7 +29,7 @@ pipeline {
         stage('Trigger Update dockertag') {
        steps{
             echo "triggering updatemanifestjob"
-            build job: 'updatemanifest', parameters: [string(name: 'DOCKERTAG', value: env.":$BUILD_NUMBER")]
+            build job: 'updatemanifest', parameters: [string(name: 'DOCKERTAG', value: registry.":$BUILD_NUMBER")]
         }
         }
     }
