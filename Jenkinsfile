@@ -1,36 +1,28 @@
-pipeline {
-    environment {
-        registry = "docreg.eprocure.gov.pk:5000/test"
-        dockerImage = ""
+node {
+    def app
+
+    stage('Clone repository') {
+      
+
+        checkout scm
     }
-    agent any
-    stages {
-        stage('git clone') {
-            steps {
-                git branch: 'main', url: 'https://github.com/faheemkhan5/test.git'
-            }
-        }
-        stage('docker build and push') {
-            steps{
-              script {
-                 dockerImage = docker.build registry + ":$BUILD_NUMBER"
-        }
-            }
-        }
-        stage('Push Image') {
-      steps{
-        script {
-          docker.withRegistry( "" ) {
-            dockerImage.push("${BUILD_NUMBER}")
-          }
-        }
+
+    stage('Update GIT') {
+            script {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    withCredentials([usernamePassword(credentialsId: 'github01', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                        //def encodedPassword = URLEncoder.encode("$GIT_PASSWORD",'UTF-8')
+                        sh "git config user.email fazalrahim@ppra.org.pk"
+                        sh "git config user.name faheemkhan5"
+                        //sh "git switch master"
+                        sh "cat website.yaml"
+                        sh "sed -i 's+docreg.eprocure.gov.pk/test.*+docreg.eprocure.gov.pk/test:${DOCKERTAG}+g' deployment.yaml"
+                        sh "cat deployment.yaml"
+                        sh "git add ."
+                        sh "git commit -m 'Done by Jenkins Job changemanifest: ${env.BUILD_NUMBER}'"
+                        sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${GIT_USERNAME}/gitops.git HEAD:main"
       }
-        }
-        stage('Trigger Update dockertag') {
-       steps{
-            echo "triggering updatemanifestjob"
-            build job: 'updatemanifest', parameters: [string(name: 'DOCKERTAG', value: env.":$BUILD_NUMBER")]
-        }
-        }
     }
+  }
+}
 }
