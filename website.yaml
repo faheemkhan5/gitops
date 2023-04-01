@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: test1
-        image: docreg.eprocure.gov.pk/test:${BUILD_NUMBER}
+        image: docreg.eprocure.gov.pk/test:latest
         resources:
           limits:
             memory: "128Mi"
